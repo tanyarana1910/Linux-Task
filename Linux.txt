@@ -1,0 +1,200 @@
+Section A
+1-Create a manual page for internsctl using man.
+2-Implement the --help option for displaying usage examples.
+3-Implement the --version option for displaying the command version.
+Create File--
+touch internsctl
+chmod +x internsctl
+
+#!/bin/bash
+
+# Function for displaying the manual page
+show_manual() {
+    echo "MANUAL PAGE"
+    echo "============="
+    echo "Usage: internsctl [OPTIONS]"
+    echo "Options:"
+    echo "  --help           Display help and usage examples"
+    echo "  --version        Display command version"
+    echo "  cpu getinfo      Get CPU information (Similar to lscpu)"
+    echo "  memory getinfo   Get memory information (Similar to free)"
+    echo "  user create <username>   Create a new user"
+    echo "  user list                List all regular users"
+    echo "  user list --sudo-only    List users with sudo permissions"
+    echo "  file getinfo <file-name> Get information about a file"
+    echo "  file getinfo [options] <file-name>    Get specific information about a file"
+    # Add more options and explanations for each command here based on the provided requirements
+}
+
+# Function for displaying command version
+show_version() {
+    echo "internsctl v0.1.0"
+}
+
+# Function for handling different functionalities based on user input
+handle_command() {
+    case "$1" in
+        --help)
+            show_manual
+            ;;
+        --version)
+            show_version
+            ;;
+        cpu)
+            # Logic for CPU information
+            ;;
+        memory)
+            # Logic for memory information
+            ;;
+        user)
+            # Logic for user-related commands
+            ;;
+        file)
+            # Logic for file-related commands
+            ;;
+        *)
+            echo "Invalid command or option. Use 'internsctl --help' for usage instructions."
+            ;;
+    esac
+}
+
+# Main function to execute the script
+main() {
+    handle_command "$@"
+}
+
+# Execute main function with provided arguments
+main "$@"
+
+
+Section B--
+#!/bin/bash
+
+# ... (Previous code remains unchanged)
+
+# Function to get CPU information similar to lscpu
+get_cpu_info() {
+    lscpu
+}
+
+# Function to get memory information similar to free
+get_memory_info() {
+    free -h
+}
+
+# Updated handle_command function to include CPU and memory information functionalities
+handle_command() {
+    case "$1" in
+        # ... (Other cases remain unchanged)
+        cpu)
+            case "$2" in
+                getinfo)
+                    get_cpu_info
+                    ;;
+                *)
+                    echo "Invalid command or option for 'cpu'. Use 'internsctl cpu getinfo' to get CPU information."
+                    ;;
+            esac
+            ;;
+        memory)
+            case "$2" in
+                getinfo)
+                    get_memory_info
+                    ;;
+                *)
+                    echo "Invalid command or option for 'memory'. Use 'internsctl memory getinfo' to get memory information."
+                    ;;
+            esac
+            ;;
+    
+        *)
+            echo "Invalid command or option. Use 'internsctl --help' for usage instructions."
+            ;;
+    esac
+}
+
+
+Section C---
+
+#!/bin/bash
+
+# ... (Previous code remains unchanged)
+
+# Function to create a new user
+create_user() {
+    if [ "$#" -ne 2 ]; then
+        echo "Usage: internsctl user create <username>"
+    else
+        sudo adduser "$2"
+    fi
+}
+
+# Function to list all regular users or users with sudo permissions
+list_users() {
+    if [ "$2" == "--sudo-only" ]; then
+        getent group sudo | cut -d: -f4
+    else
+        getent passwd | cut -d: -f1
+    fi
+}
+
+# Function to get information about a file based on options
+get_file_info() {
+    local filename="$2"
+    if [ ! -f "$filename" ]; then
+        echo "File '$filename' not found."
+    else
+        case "$3" in
+            --size|-s)
+                stat -c "%s" "$filename"
+                ;;
+            --permissions|-p)
+                stat -c "%A" "$filename"
+                ;;
+            --owner|-o)
+                stat -c "%U" "$filename"
+                ;;
+            --last-modified|-m)
+                stat -c "%y" "$filename"
+                ;;
+            *)
+                echo "Invalid options. Use --size, --permissions, --owner, or --last-modified."
+                ;;
+        esac
+    fi
+}
+
+# Updated handle_command function to include user and file functionalities
+handle_command() {
+    case "$1" in
+        # ... (Other cases remain unchanged)
+        user)
+            case "$2" in
+                create)
+                    create_user "$@"
+                    ;;
+                list)
+                    list_users "$@"
+                    ;;
+                *)
+                    echo "Invalid command or option for 'user'."
+                    ;;
+            esac
+            ;;
+        file)
+            case "$2" in
+                getinfo)
+                    get_file_info "$@"
+                    ;;
+                *)
+                    echo "Invalid command or option for 'file'."
+                    ;;
+            esac
+            ;;
+        # ... (Other cases remain unchanged)
+    esac
+}
+
+# ... (Rest of the code remains unchanged)
+
+
